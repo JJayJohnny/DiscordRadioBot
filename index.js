@@ -9,6 +9,8 @@ const generateVoice = require('./generateVoice')
 
 dotenv.config()
 
+global.serverURL = ""
+
 const LOAD_SLASH = process.argv[2] == "load"
 
 const client = new Discord.Client({

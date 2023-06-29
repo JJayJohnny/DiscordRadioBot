@@ -5,7 +5,7 @@ const FormData = require('form-data')
 const gTTS = require('gtts')
 
 module.exports = async function generateVoice(track, interaction){
-    http.get({timeout: 1000, host: process.env.SERVER_URL}, (res) => {
+    http.get({timeout: 1000, host: global.serverURL}, (res) => {
         data = ''
         res.on('data', (chunk) => {
             data += chunk;
@@ -36,7 +36,7 @@ module.exports = async function generateVoice(track, interaction){
 
     axios({
         method: "post",
-        url: "http://"+process.env.SERVER_URL+'/generate',
+        url: "http://"+global.serverURL+'/generate',
         data: bodyFormData,
         headers: { "Content-Type": "multipart/form-data" },
       })
