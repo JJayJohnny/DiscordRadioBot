@@ -4,7 +4,7 @@ const {REST} = require("@discordjs/rest")
 const {Routes} = require("discord-api-types/v9")
 const fs = require("fs")
 const  {Player} = require("discord-player")
-const { YoutubeExtractor } = require("@discord-player/extractor")
+const { YoutubeExtractor, AttachmentExtractor } = require("@discord-player/extractor")
 
 dotenv.config()
 
@@ -26,6 +26,14 @@ const player = new Player(client, {
     }
 })
 player.extractors.register(YoutubeExtractor, {})
+player.extractors.register(AttachmentExtractor, {})
+
+player.events.on('playerFinish', (queue, track) => {
+    // Emitted when the player starts to play a song
+    if(track.queryType == 'file'){
+        fs.unlinkSync(track.url)
+    }
+});
 
 let commands = []
 
