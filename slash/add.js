@@ -15,13 +15,18 @@ module.exports = {
 
         try{
             const player = useMainPlayer()
-            const {track} = await player.play(interaction.member.voice.channel, query)
+            const {track} = await player.play(interaction.member.voice.channel, query, {
+                nodeOptions: {
+                    metadata: interaction
+                }
+            })
             let embed = new EmbedBuilder()
                     .setTitle("SONG")
                     .setDescription(`[${track.title}](${track.url}) has been added to the queue`)
                     .setThumbnail(track.thumbnail)
                     .setFooter({ text: `Duration: ${track.duration}`})
             console.log(track)
+
             return interaction.editReply({
                 embeds: [embed]
         })

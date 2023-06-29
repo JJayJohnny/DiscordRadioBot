@@ -16,10 +16,13 @@ module.exports = {
             if(err) { throw new Error(err); }
             console.log("Text convered into speech");
             await player.play(interaction.member.voice.channel, `tempAudio/${text}.mp3`, {
-                searchEngine: QueryType.FILE
+                searchEngine: QueryType.FILE,
+                nodeOptions: {
+                    metadata: interaction
+                }
             })
         });
-
+        
         await interaction.editReply(text)
 
     }    

@@ -5,6 +5,7 @@ const {Routes} = require("discord-api-types/v9")
 const fs = require("fs")
 const  {Player} = require("discord-player")
 const { YoutubeExtractor, AttachmentExtractor } = require("@discord-player/extractor")
+const generateVoice = require('./generateVoice')
 
 dotenv.config()
 
@@ -32,6 +33,17 @@ player.events.on('playerFinish', (queue, track) => {
     // Emitted when the player starts to play a song
     if(track.queryType == 'file'){
         fs.unlinkSync(track.url)
+    }
+});
+
+player.events.on('audioTrackAdd', (queue, track) => {
+    // Emitted when the player adds a single song to its queue
+    if(queue.currentTrack == null)
+        console.log('First track')
+    else{
+        console.log('Not first track')
+        if(track.queryType != 'file')
+            generateVoice(track, queue.metadata)
     }
 });
 
