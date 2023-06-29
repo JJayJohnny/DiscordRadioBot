@@ -5,6 +5,8 @@ const FormData = require('form-data')
 const gTTS = require('gtts')
 
 module.exports = async function generateVoice(track, interaction){
+    if(global.serverURL == "")
+        return
     http.get({timeout: 1000, host: global.serverURL}, (res) => {
         data = ''
         res.on('data', (chunk) => {
@@ -45,6 +47,7 @@ module.exports = async function generateVoice(track, interaction){
             let text = response.data.message
             text = text.split('###')[2]
             text = text.replace(" Prezenter: ", "")
+            text = text.replace('"', '')
             console.log(text)
 
             const player = useMainPlayer()
