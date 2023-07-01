@@ -6,8 +6,13 @@ const gTTS = require('gtts')
 const fs = require('fs')
 
 module.exports = async function generateVoice(track, interaction){
-    if(global.serverURL == "")
+    if(global.serverURL == ""){
+        if(global.remindedServerURL == false){
+            interaction.channel.send("Remember to set url for language model server")
+            global.remindedServerURL = true
+        }
         return
+    }
     http.get({timeout: 1000, host: global.serverURL}, (res) => {
         data = ''
         res.on('data', (chunk) => {

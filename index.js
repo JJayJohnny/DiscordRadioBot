@@ -10,6 +10,7 @@ const generateVoice = require('./generateVoice')
 dotenv.config()
 
 global.serverURL = ""
+global.remindedServerURL=false
 
 const client = new Discord.Client({
     intents: [
