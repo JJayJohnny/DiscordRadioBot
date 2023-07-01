@@ -3,6 +3,7 @@ const http = require('http')
 const axios = require('axios')
 const FormData = require('form-data')
 const gTTS = require('gtts')
+const fs = require('fs')
 
 module.exports = async function generateVoice(track, interaction){
     if(global.serverURL == "")
@@ -64,8 +65,10 @@ module.exports = async function generateVoice(track, interaction){
                 })
                 const trackIndex = getTrackPositionInQueue(track, interaction)
                 console.log(trackIndex)
-                if(trackIndex < 0 )
+                if(trackIndex < 0 ){
+                    fs.unlinkSync(searchResult.tracks[0].url)
                     return
+                }
                 queue.insertTrack(searchResult.tracks[0], trackIndex)
             });
         })
