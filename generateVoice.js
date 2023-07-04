@@ -5,6 +5,8 @@ const FormData = require('form-data')
 const gTTS = require('gtts')
 const fs = require('fs')
 
+moods = ['happy', 'sad', 'energetic', 'proffesional', 'negative', 'funny', 'relaxing', 'reflective', 'calm', 'angry', 'none']
+
 module.exports = async function generateVoice(track, interaction){
     if(global.serverURL == ""){
         if(global.remindedServerURL == false){
@@ -41,7 +43,7 @@ module.exports = async function generateVoice(track, interaction){
     console.log('Text server active')
 
     let bodyFormData = new FormData()
-    bodyFormData.append('prompt', `Jesteś prezenterem w radiu. Napisz zapowiedź piosenki: "${track.title}" autorstwa "${track.author}".`)
+    bodyFormData.append('prompt', generatePrompt(track))
 
     axios({
         method: "post",
@@ -52,10 +54,11 @@ module.exports = async function generateVoice(track, interaction){
         .then(function (response) {
           //handle success     
             let text = response.data.message
+            console.log(text)
             text = text.split('###')[2]
             text = text.replace(" Prezenter: ", "")
             text = text.replace('"', '')
-            console.log(text)
+            // console.log(text)
 
             const player = useMainPlayer()
             const queue = useQueue(interaction.guild.id)
@@ -91,4 +94,15 @@ function getTrackPositionInQueue(track, interaction){
     let tracks = queue.tracks.toArray()
 
     return tracks.indexOf(track)
+}
+
+function generatePrompt(track){
+
+    let mood = moods[Math.floor(Math.random() * moods.length)]
+
+    let prompt = `Jesteś prezenterem w radiu. Napisz zapowiedź piosenki: "${track.title}" autorstwa "${track.author}". Mood: ${mood}`
+    
+    //using the Alpaca format
+    return `### Instrukcja: ${prompt}\n### Prezenter:`
+    // return `### Instrukcja: Jesteś prezenterem w radiu. Napisz zapowiedź piosenki.\n### Input: Title: ${track.title}, Author: ${track.author}, Mood: ${mood}\n### Prezenter:`
 }
