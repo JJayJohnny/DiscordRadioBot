@@ -13,6 +13,7 @@ module.exports = async function generateVoice(track, interaction){
         }
         return
     }
+    //check if the GPT server is online
     http.get({timeout: 1000, host: global.serverURL}, (res) => {
         data = ''
         res.on('data', (chunk) => {
@@ -71,6 +72,7 @@ module.exports = async function generateVoice(track, interaction){
                 const trackIndex = getTrackPositionInQueue(track, interaction)
                 console.log(trackIndex)
                 if(trackIndex < 0 ){
+                    //track is no longer in queue or already started playing
                     fs.unlinkSync(searchResult.tracks[0].url)
                     return
                 }

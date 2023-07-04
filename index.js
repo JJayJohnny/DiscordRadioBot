@@ -10,7 +10,9 @@ const generateVoice = require('./generateVoice')
 dotenv.config()
 
 global.serverURL = ""
-global.remindedServerURL=false
+global.remindedServerURL = false
+global.streamVolume = 10
+global.ttsVolume = 80
 
 const client = new Discord.Client({
     intents: [
@@ -45,6 +47,17 @@ player.events.on('audioTrackAdd', (queue, track) => {
         console.log('Not first track')
         if(track.queryType != 'file')
             generateVoice(track, queue.metadata)
+    }
+});
+
+player.events.on('playerStart', (queue, track) => {
+    if(track.queryType == 'file'){
+        queue.node.setVolume(global.ttsVolume)
+        console.log("Introduction volume")
+    }
+    else{
+        queue.node.setVolume(global.streamVolume)
+        console.log("Song volume")
     }
 });
 
