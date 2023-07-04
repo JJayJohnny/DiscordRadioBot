@@ -3,7 +3,7 @@ const {PermissionFlagsBits} = require('discord.js')
 
 module.exports = {
     data: new SlashCommandBuilder()
-            .setName("lmurl")
+            .setName("gpt-url")
             .setDescription("Set the url to the language model server")
             .addStringOption((option) => option.setName("url").setDescription("URL").setRequired(true))
             .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
