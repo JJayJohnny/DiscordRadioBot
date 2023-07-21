@@ -15,15 +15,12 @@ module.exports = {
         if(queue){
             queue.delete()
             //delete all temp files
-            fs.readdir(directory, (err, files) => {
+            let audioFiles = fs.readdirSync(directory).filter(file => file.endsWith('.mp3'))
+            for (const file of audioFiles) {
+              fs.unlink(path.join(directory, file), (err) => {
                 if (err) throw err;
-              
-                for (const file of files) {
-                  fs.unlink(path.join(directory, file), (err) => {
-                    if (err) throw err;
-                  });
-                }
-            });
+              });
+            }
         }
 
         await interaction.editReply("Bye")
