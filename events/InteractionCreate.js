@@ -2,6 +2,7 @@ const {Events} = require('discord.js')
 
 module.exports = {
     name: Events.InteractionCreate,
+    receiver: 'client',
     async execute(interaction){
         if(!interaction.isCommand())
             return

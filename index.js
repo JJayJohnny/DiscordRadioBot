@@ -5,7 +5,6 @@ const {Routes} = require("discord-api-types/v9")
 const fs = require("fs")
 const  {Player} = require("discord-player")
 const { YoutubeExtractor, AttachmentExtractor } = require("@discord-player/extractor")
-const generateVoice = require('./generateVoice')
 
 dotenv.config()
 
@@ -33,35 +32,6 @@ const player = new Player(client, {
 })
 player.extractors.register(YoutubeExtractor, {})
 player.extractors.register(AttachmentExtractor, {})
-
-player.events.on('playerFinish', (queue, track) => {
-    // Emitted when the player starts to play a song
-    if(track.queryType == 'file'){
-        fs.unlinkSync(track.url)
-    }
-});
-
-player.events.on('audioTrackAdd', (queue, track) => {
-    // Emitted when the player adds a single song to its queue
-    if(queue.currentTrack == null)
-        console.log('First track')
-    else{
-        console.log('Not first track')
-        if(track.queryType != 'file')
-            generateVoice(track, queue.metadata)
-    }
-});
-
-player.events.on('playerStart', (queue, track) => {
-    if(track.queryType == 'file'){
-        queue.node.setVolume(global.ttsVolume)
-        console.log("TTS volume")
-    }
-    else{
-        queue.node.setVolume(global.streamVolume)
-        console.log("Song volume")
-    }
-});
 
 let commands = []
 
@@ -95,7 +65,11 @@ function loadEvents(){
     for(const file of eventFiles){
         const event = require(`./events/${file}`)
 
-        let receiver = client
+        let receiver;
+        if(event.receiver == 'player') receiver = player.events
+        else if(event.receiver == 'client') receiver = client
+        else continue
+
         if(event.once) receiver.once(event.name, (...args) => event.execute(...args))
         else receiver.on(event.name, (...args) => event.execute(...args))
     }
