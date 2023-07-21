@@ -4,6 +4,7 @@ const axios = require('axios')
 const FormData = require('form-data')
 const gTTS = require('gtts')
 const fs = require('fs')
+const {nanoid}  = require('nanoid/async')
 
 moods = ['happy', 'sad', 'energetic', 'proffesional', 'negative', 'funny', 'relaxing', 'reflective', 'calm', 'angry', 'none']
 
@@ -51,7 +52,7 @@ module.exports = async function generateVoice(track, interaction){
         data: bodyFormData,
         headers: { "Content-Type": "multipart/form-data" },
       })
-        .then(function (response) {
+        .then(async function (response) {
           //handle success     
             let text = response.data.message
             console.log(text)
@@ -65,11 +66,11 @@ module.exports = async function generateVoice(track, interaction){
 
             const gtts = new gTTS(text, 'pl')
 
-            const number = Math.floor(Math.random() * (999999999 - 100000000) + 100000000)
-            gtts.save(`tempAudio/${number.toString()}.mp3`, async function (err, result){
+            const fileName = await nanoid(10)
+            gtts.save(`tempAudio/${fileName}.mp3`, async function (err, result){
                 if(err) { throw new Error(err); }
                 console.log("Text convered into speech");
-                const searchResult = await player.search(`tempAudio/${number.toString()}.mp3`, {
+                const searchResult = await player.search(`tempAudio/${fileName}.mp3`, {
                     searchEngine: QueryType.FILE
                 })
                 const trackIndex = getTrackPositionInQueue(track, interaction)

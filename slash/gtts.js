@@ -1,6 +1,7 @@
 const {SlashCommandBuilder} = require("@discordjs/builders")
 const {useMainPlayer, QueryType} = require("discord-player")
 const gTTS = require('gtts')
+const {nanoid} = require('nanoid/async')
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -12,10 +13,11 @@ module.exports = {
         let text = interaction.options.getString("text")
         const gtts = new gTTS(text, 'pl')
 
-        gtts.save(`tempAudio/${text}.mp3`, async function (err, result){
+        const fileName = await nanoid(10)
+        gtts.save(`tempAudio/${fileName}.mp3`, async function (err, result){
             if(err) { throw new Error(err); }
             console.log("Text converted into speech");
-            await player.play(interaction.member.voice.channel, `tempAudio/${text}.mp3`, {
+            await player.play(interaction.member.voice.channel, `tempAudio/${fileName}.mp3`, {
                 searchEngine: QueryType.FILE,
                 nodeOptions: {
                     metadata: interaction
