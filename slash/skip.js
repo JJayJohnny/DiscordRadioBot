@@ -8,6 +8,10 @@ module.exports = {
     run: async ({client, interaction}) => {
         const queue = useQueue(interaction.guild.id)
         queue.node.skip()
-        await interaction.editReply("Skipped ->")
+        const nextTrack = queue.tracks.toArray()[0]
+        if(nextTrack)
+            await interaction.editReply(`Skipped -> ${nextTrack.title}`)
+        else
+            await interaction.editReply(`End of queue`)
     }
 }
