@@ -14,6 +14,8 @@ global.remindedServerURL = false
 global.streamVolume = 10
 global.ttsVolume = 80
 
+const LOAD_SLASH = process.argv[2] == "loadSlash"
+
 const client = new Discord.Client({
     intents: [
         Discord.IntentsBitField.Flags.Guilds,
@@ -67,41 +69,34 @@ const slashFiles = fs.readdirSync("./slash").filter(file => file.endsWith(".js")
 for(const file of slashFiles){
     const slashcmd = require(`./slash/${file}`)
     client.slashcommands.set(slashcmd.data.name, slashcmd)
-    commands.push(slashcmd.data.toJSON())
+    if(LOAD_SLASH) commands.push(slashcmd.data.toJSON())
 }
 
-client.on("ready", () => {
-    const guildIDs = client.guilds.cache.map(guild => guild.id)
-    const rest = new REST({version: "9"}).setToken(process.env.TOKEN)
+if(LOAD_SLASH){
+    const rest = new REST({version: "10"}).setToken(process.env.TOKEN)
     console.log("Deploying slash commands")
-    for(const guildID of guildIDs){
-        rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, guildID), {body: commands})
-        .then(() => {
-            console.log(`Added commands to ${guildID}`)
+    rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {body: commands})
+        .then((data) => {
+            console.log(`Deployed ${data.length} commands`)
         })
         .catch((err) => {
-            if(err){
-                console.log(err)
-                process.exit(1)
-            }
+            console.log(err)
+            process.exit(1)
         })
+}
+else{
+    loadEvents()
+    client.login(process.env.TOKEN)
+}
+
+function loadEvents(){
+    const eventFiles = fs.readdirSync("./events").filter(file => file.endsWith(".js"))
+
+    for(const file of eventFiles){
+        const event = require(`./events/${file}`)
+
+        let receiver = client
+        if(event.once) receiver.once(event.name, (...args) => event.execute(...args))
+        else receiver.on(event.name, (...args) => event.execute(...args))
     }
-    console.log(`Logged in as ${client.user.tag}`)
-})
-
-client.login(process.env.TOKEN)
-
-client.on("interactionCreate", (interaction) => {
-    async function handleCommand(){
-        if(!interaction.isCommand())
-            return
-        const slashcmd = client.slashcommands.get(interaction.commandName)
-        if(!slashcmd)
-            interaction.reply("Not a valid command")
-        await interaction.deferReply()
-        await slashcmd.run({client, interaction})
-    }
-    handleCommand()
-})
-
-
+}
