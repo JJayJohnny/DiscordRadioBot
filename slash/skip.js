@@ -7,7 +7,6 @@ module.exports = {
         .setDescription("Skip curretnly playing track"),
     run: async ({client, interaction}) => {
         const queue = useQueue(interaction.guild.id)
-        console.log(queue)
         queue.node.skip()
         await interaction.editReply("Skipped ->")
     }

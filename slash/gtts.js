@@ -14,7 +14,7 @@ module.exports = {
 
         gtts.save(`tempAudio/${text}.mp3`, async function (err, result){
             if(err) { throw new Error(err); }
-            console.log("Text convered into speech");
+            console.log("Text converted into speech");
             await player.play(interaction.member.voice.channel, `tempAudio/${text}.mp3`, {
                 searchEngine: QueryType.FILE,
                 nodeOptions: {

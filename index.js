@@ -53,7 +53,7 @@ player.events.on('audioTrackAdd', (queue, track) => {
 player.events.on('playerStart', (queue, track) => {
     if(track.queryType == 'file'){
         queue.node.setVolume(global.ttsVolume)
-        console.log("Introduction volume")
+        console.log("TTS volume")
     }
     else{
         queue.node.setVolume(global.streamVolume)
