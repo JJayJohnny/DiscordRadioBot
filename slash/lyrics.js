@@ -9,6 +9,7 @@ module.exports = {
             .setDescription('Find lyrics of currently playing song'),
     run: async ({client, interaction}) => {
         const queue = useQueue(interaction.guild.id)
+        if(queue == null) return interaction.editReply('There is nothing playing right now')
         const currentTrack = queue.currentTrack
         
         if(currentTrack.queryType == 'file') return interaction.editReply("You can't search lyrics for that")

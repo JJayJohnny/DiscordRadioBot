@@ -8,6 +8,7 @@ module.exports = {
         .setDescription("Display currently plaing queue"),
     run: async ({client, interaction}) => {
         const queue = useQueue(interaction.guild.id)
+        if(queue == null) return interaction.editReply('There is nothing playing right now')
         const tracks = queue.tracks.toArray()
         const currentTrack = queue.currentTrack
 
