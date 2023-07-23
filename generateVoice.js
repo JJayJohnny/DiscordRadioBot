@@ -5,6 +5,7 @@ const FormData = require('form-data')
 const gTTS = require('gtts')
 const fs = require('fs')
 const {nanoid}  = require('nanoid/async')
+const LastFM = require('last-fm')
 
 moods = ['happy', 'sad', 'energetic', 'proffesional', 'negative', 'funny', 'relaxing', 'reflective', 'calm', 'angry', 'none']
 
@@ -44,7 +45,7 @@ module.exports = async function generateVoice(track, interaction){
     console.log('Text server active')
 
     let bodyFormData = new FormData()
-    bodyFormData.append('prompt', generatePrompt(track))
+    bodyFormData.append('prompt', await generatePrompt(track))
 
     axios({
         method: "post",
@@ -56,7 +57,7 @@ module.exports = async function generateVoice(track, interaction){
           //handle success     
             let text = response.data.message
             console.log(text)
-            text = text.split('###')[2]
+            text = text.split('###')[3]
             text = text.replace(" Prezenter: ", "")
             text = text.replace('"', '')
             // console.log(text)
@@ -97,13 +98,43 @@ function getTrackPositionInQueue(track, interaction){
     return tracks.indexOf(track)
 }
 
-function generatePrompt(track){
+async function generatePrompt(track){
 
-    let mood = moods[Math.floor(Math.random() * moods.length)]
+    try{
+        const lastfm = new LastFM(process.env.LASTFM_KEY)
+        let prompt = await new Promise((resolve, reject) => {
+            lastfm.trackSearch({q: track.title}, (err, data) => {
+                if (err){
+                    console.log(err)
+                    reject(err)
+                }
+                else{
+                    lastfm.artistInfo({name: data.result[0].artistName}, async (err2, info) => {
+                        if(err2){
+                            console.log(err2)
+                            reject(err2)
+                        }
+                        else{
+                            input = `\nTitle: ${track.title}\nAuthor: ${info.name}`
+                            if(info.tags.length != 0) input = input + `\nTags: ${info.tags}`
+                            if(info.summary != '') input = input + `\nAuthor info: ${info.summary.split('\n')[0]}`
 
-    let prompt = `Jesteś prezenterem w radiu. Napisz zapowiedź piosenki: "${track.title}" autorstwa "${track.author}". Mood: ${mood}`
+                            input = input + `\nSeed: ${await nanoid(10)}`
+
+                            resolve(`### Instrukcja: Jesteś prezenterem w radiu. Napisz interesującą zapowiedź następującej piosenki.\n### Input: ${input}\n### Prezenter:`)
+                        }
+                    })
+                }
+            })
+        })
+        return prompt
+    }
+    catch(e){
+        //if anything occurs with lastfm cheat by randomizing prompt
+        let mood = moods[Math.floor(Math.random() * moods.length)]
+        // let prompt = `Jesteś prezenterem w radiu. Napisz zapowiedź piosenki: "${track.title}" autorstwa "${track.author}". Mood: ${mood}`
     
-    //using the Alpaca format
-    return `### Instrukcja: ${prompt}\n### Prezenter:`
-    // return `### Instrukcja: Jesteś prezenterem w radiu. Napisz zapowiedź piosenki.\n### Input: Title: ${track.title}, Author: ${track.author}, Mood: ${mood}\n### Prezenter:`
+        //using the Alpaca format
+        return `### Instrukcja: Jesteś prezenterem w radiu. Napisz interesującą zapowiedź następującej piosenki.\n### Input:\nTitle: ${track.title}\n Author: ${track.author}\n Mood: ${mood}\n### Prezenter:`
+    }
 }
