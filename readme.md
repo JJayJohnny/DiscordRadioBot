@@ -63,5 +63,8 @@ Keep in mind that Google Colab shuts down unused environments, so you need to ke
 ## Final thoughts
 This project is mostly a `proof of concept`, as it could be vastly improved by having more resources to work with. The main thing to change would be to use a larger language model, preferably tuned with data about artists and their work. The other thing to change would be the TextToSpeech. I've used Google's TTS as it was the only free one with any polish language support.
 
+## License
+Discord Radio Bot is released under the [MIT License](LICENSE.txt).
+
 ## Disclaimer
 I am not liable for any direct, indirect, consequential, incidental, or special damages arising out of or in any way connected with the use/misuse or inability to use this software.
